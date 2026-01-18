@@ -182,7 +182,7 @@ Run `nsfg_replication_unified.R` → `figure8_age_falsification.png`
 @article{author2025sexrecession,
   title={Reconciling the Sex Recession Debate: Evidence of Male Exclusion from Three National Surveys},
   author={[Author]},
-  journal={Aporia Magazine},
+  journal={},
   year={2025},
   month={January}
 }
