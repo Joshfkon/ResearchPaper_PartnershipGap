@@ -4,7 +4,7 @@ Replication code and instructions for:
 
 **"Reconciling the Sex Recession Debate: Evidence of Male Exclusion from Three National Surveys"**
 
-Published in *Aporia Magazine*, January 2025
+
 
 ## Overview
 
