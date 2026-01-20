@@ -2,13 +2,13 @@
 
 Replication code and instructions for:
 
-**"Reconciling the Sex Recession Debate: Evidence of Male Exclusion from Three National Surveys"**
+**"Reconciling the Sex Recession Debate: Evidence of Male Exclusion from Two National Surveys"**
 
 
 
 ## Overview
 
-This paper reconciles conflicting findings in the "sex recession" literature by distinguishing virginity (delayed sexual debut, which rose symmetrically for both genders) from dry spells (market dysfunction among the sexually experienced, which diverged by gender). Using three independent data sources—the General Social Survey (GSS), the National Survey of Family Growth (NSFG), and the Current Population Survey (CPS)—the analysis finds consistent evidence that dating apps caused a 3-10 percentage point widening of the male-female partnership gap among young adults.
+This paper reconciles conflicting findings in the "sex recession" literature by distinguishing virginity (delayed sexual debut, which rose symmetrically for both genders) from dry spells (market dysfunction among the sexually experienced, which diverged by gender). Using two independent data sources—the General Social Survey (GSS) and the National Survey of Family Growth (NSFG)—the analysis finds consistent evidence of a post-2012 widening of the male-female partnership gap among young adults, with dating apps as a plausible contributing mechanism.
 
 ### Key Findings
 
@@ -16,7 +16,6 @@ This paper reconciles conflicting findings in the "sex recession" literature by 
 |--------|-----------------|-----------|--------------|---------|
 | GSS | Past-year sexlessness | 18-24 | +10.6 pp | .024 |
 | NSFG | Dry spell (sexually experienced) | 18-24 | +6.2 pp | .014 |
-| CPS | Never-married, no partner | 25-34 | +3.2 pp | <.001 |
 
 ## Repository Structure
 
@@ -24,8 +23,7 @@ This paper reconciles conflicting findings in the "sex recession" literature by 
 ├── README.md
 ├── code/
 │   ├── gss_replication_unified.R      # GSS analysis
-│   ├── nsfg_replication_unified.R     # NSFG analysis
-│   └── cps_replication_unified.R      # CPS analysis
+│   └── nsfg_replication_unified.R     # NSFG analysis
 ├── data/
 │   ├── README_data.md                 # Data acquisition instructions
 │   └── [data files - not included]
@@ -52,13 +50,6 @@ This paper reconciles conflicting findings in the "sex recession" literature by 
 **Required files for 2022-2023:**
 - `NSFG-2022-2023-FemRespPUFData.sas7bdat`
 - `NSFG-2022-2023-MaleRespPUFData.sas7bdat`
-
-### 3. Current Population Survey (CPS)
-
-- **Source:** [IPUMS CPS](https://cps.ipums.org/)
-- **Years:** 2008-2023 (ASEC supplements)
-- **Key variables:** `MARST`, `PECOHAB`, `AGE`, `SEX`, `YEAR`, `ASECWT`
-- **Download:** Requires free IPUMS account. Extract must include the variables listed above.
 
 ## Software Requirements
 
@@ -111,29 +102,13 @@ source("code/nsfg_replication_unified.R")
 
 **Outputs:**
 - `NSFG_Replication_Report.pdf` - Full report
-- `figure7_virginity_vs_dryspell.png` - Virginity vs dry spell rates
-- `figure8_age_falsification.png` - Age falsification test
+- `figure4_virginity_vs_dryspell.png` - Virginity vs dry spell rates
+- `figure5_nsfg_did_trajectory.png` - DiD trajectory over time
+- `figure6_age_falsification.png` - Age falsification test
 - `nsfg_overall_sexlessness.csv` - Overall rates
 - `nsfg_dryspell_rates.csv` - Dry spell rates
 - `nsfg_age_falsification.csv` - Age falsification results
 - `nsfg_selection_bias_check.csv` - Selection bias diagnostics
-
-### CPS Analysis
-
-```r
-# First, download data from IPUMS CPS and set path:
-# data_dir <- "path/to/your/CPS/data"
-
-source("code/cps_replication_unified.R")
-```
-
-**Outputs:**
-- `CPS_Replication_Report.pdf` - Full report
-- `figure1_gender_gap_by_birthyear.png` - Main result figure
-- `figure3_cutoff_sensitivity.png` - Cutoff sensitivity
-- `figure4_decomposition.png` - Behavioral decomposition
-- `cps_main_results.csv` - Numerical results
-- `cps_robustness_checks.csv` - Robustness results
 
 ## Replicating Specific Results
 
@@ -143,26 +118,26 @@ Run `gss_replication_unified.R` → See "TABLE 1" section output and `gss_sexles
 ### Table 2 (NSFG DiD Estimates)
 Run `nsfg_replication_unified.R` → See "TABLE 2" section output
 
-### Figure 1 (CPS Gender Gap by Birth Year)
-Run `cps_replication_unified.R` → `figure1_gender_gap_by_birthyear.png`
+### Figure 4 (NSFG Virginity vs Dry Spell)
+Run `nsfg_replication_unified.R` → `figure4_virginity_vs_dryspell.png`
 
-### Figure 5 (GSS Age Falsification)
-Run `gss_replication_unified.R` → `figure5_gss_age_falsification.png`
+### Figure 5 (GSS Age Falsification / NSFG DiD Trajectory)
+- GSS: Run `gss_replication_unified.R` → `figure5_gss_age_falsification.png`
+- NSFG: Run `nsfg_replication_unified.R` → `figure5_nsfg_did_trajectory.png`
 
-### Figure 7 (NSFG Virginity vs Dry Spell)
-Run `nsfg_replication_unified.R` → `figure7_virginity_vs_dryspell.png`
-
-### Figure 8 (NSFG Age Falsification)
-Run `nsfg_replication_unified.R` → `figure8_age_falsification.png`
+### Figure 6 (Convergent Evidence / GSS Robustness / NSFG Age Falsification)
+- Convergent Evidence: Generated from main results
+- GSS Robustness: Run `gss_replication_unified.R` → `figure6_gss_robustness.png`
+- NSFG Age Falsification: Run `nsfg_replication_unified.R` → `figure6_age_falsification.png`
 
 ### Appendix Tables B1-B6
 - B1-B4 (GSS): `gss_sexlessness_results.xlsx`
 - B5-B6 (NSFG): Console output from `nsfg_replication_unified.R`
 
-### Appendix E (Robustness)
-- E1 Event-study: `gss_event_study.png`
-- E2 Specification curve: `gss_specification_curve.png`
-- E5 Selection bias: Console output from `nsfg_replication_unified.R`
+### Appendix D (Robustness)
+- D1 Event-study: `gss_event_study.png`
+- D3 Specification curve: `gss_specification_curve.png`
+- D5 Selection bias: Console output from `nsfg_replication_unified.R`
 
 ## Notes on Replication
 
@@ -172,16 +147,14 @@ Run `nsfg_replication_unified.R` → `figure8_age_falsification.png`
 
 3. **NSFG measurement change:** The NSFG expanded its definition of sexual intercourse in the 2011-2013 wave. The "post-change-only" robustness check (2011-2013 vs 2015-2017) addresses this.
 
-4. **CPS secular trend:** The CPS analysis accounts for a pre-existing secular trend in the gender gap (0.5 pp/decade widening since the 1960s). The app-era effect is measured as acceleration beyond this trend.
-
-5. **Minor numerical differences:** Due to differences in software versions and floating-point arithmetic, replicated results may differ from published values by small amounts (typically <0.1 pp).
+4. **Minor numerical differences:** Due to differences in software versions and floating-point arithmetic, replicated results may differ from published values by small amounts (typically <0.1 pp).
 
 ## Citation
 
 ```bibtex
-@article{author2025sexrecession,
-  title={Reconciling the Sex Recession Debate: Evidence of Male Exclusion from Three National Surveys},
-  author={[Author]},
+@article{konstantinos2025sexrecession,
+  title={Reconciling the Sex Recession Debate: Evidence of Male Exclusion from Two National Surveys},
+  author={Konstantinos, Joshua},
   journal={},
   year={2025},
   month={January}
@@ -196,4 +169,4 @@ For questions about the replication materials, please [open an issue](../../issu
 
 Code: MIT License
 
-Data: Subject to original data provider terms (NORC/GSS, CDC/NSFG, IPUMS/CPS)
+Data: Subject to original data provider terms (NORC/GSS, CDC/NSFG)
