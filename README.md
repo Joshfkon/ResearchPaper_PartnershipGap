@@ -12,7 +12,7 @@ This repository contains replication code for all analyses in the paper:
 - **NSFG**: The male-female dry spell gap (among sexually experienced) widened by **+6.2 percentage points** (p = .014) among 18-24 year-olds between 2006-2010 and 2015-2017.
 - **CPS**: Male singlehood accelerated post-2012 with a **+1.15 pp DiD** (p = .015) and slope change of **+0.49 pp/year** (p = .003).
 
-Effects are concentrated exclusively in the youngest cohorts most exposed to app-mediated dating, with null effects in older age groups—ruling out economy-wide or culture-wide confounds.
+Effects are concentrated in the youngest cohorts (18-24) with greatest exposure to app-mediated dating, while older age groups show null effects—a pattern difficult to reconcile with economy-wide or culture-wide explanations that would affect multiple age groups.
 
 ---
 
