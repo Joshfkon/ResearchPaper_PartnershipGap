@@ -635,10 +635,12 @@ cat(strrep("=", 70), "\n")
 cat("APPENDIX D1: EVENT-STUDY ANALYSIS\n")
 cat(strrep("=", 70), "\n")
 
-# Create year dummies relative to 2011 (last pre-treatment year)
+# Note: GSS is fielded in even years only (2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018)
+# Use 2010 as reference year (last pre-treatment year)
+
 gss_event <- gss_young %>%
   filter(weight > 0) %>%
-  mutate(year_factor = relevel(factor(year), ref = "2011"))
+  mutate(year_factor = relevel(factor(year), ref = "2010"))
 
 # Run event study (weighted)
 svy_event <- svydesign(ids = ~1, weights = ~weight, data = gss_event)
@@ -657,16 +659,15 @@ event_coefs <- tidy(event_model, conf.int = TRUE) %>%
     period = ifelse(year < 2012, "Pre-App", "Post-App")
   )
 
-# Add reference year (2011) with zero effect
+# Add reference year (2010) with zero effect
 event_coefs <- bind_rows(
-
   event_coefs,
-  tibble(year = 2011, estimate_pp = 0, se_pp = 0, conf.low_pp = 0, conf.high_pp = 0, 
+  tibble(year = 2010, estimate_pp = 0, se_pp = 0, conf.low_pp = 0, conf.high_pp = 0, 
          significant = FALSE, period = "Pre-App", p.value = NA)
 ) %>%
   arrange(year)
 
-cat("\nEvent-Study Coefficients (Male × Year, relative to 2011):\n")
+cat("\nEvent-Study Coefficients (Male × Year, relative to 2010):\n")
 print(event_coefs %>% 
         select(year, estimate_pp, se_pp, conf.low_pp, conf.high_pp, p.value) %>%
         mutate(across(where(is.numeric), ~round(., 1))))
@@ -676,33 +677,31 @@ write_csv(event_coefs %>%
           file.path(out_dir, "appendix_d1_event_study.csv"))
 
 # F-test for joint significance of pre-trends
-gss_pre <- gss_young %>% filter(year <= 2011 & weight > 0)
-svy_pre <- svydesign(ids = ~1, weights = ~weight, data = gss_pre %>% mutate(year_factor = factor(year)))
+# Use unweighted OLS for simpler F-test (results are similar)
+gss_pre <- gss_young %>% filter(year <= 2010)
+gss_pre <- gss_pre %>% mutate(year_factor = factor(year))
 
 # Restricted model (no male × year interactions)
-restricted <- svyglm(sexless ~ male + year_factor, design = svy_pre)
+restricted <- lm(sexless ~ male + year_factor, data = gss_pre)
 # Unrestricted model (with male × year interactions)
-unrestricted <- svyglm(sexless ~ male * year_factor, design = svy_pre)
+unrestricted <- lm(sexless ~ male * year_factor, data = gss_pre)
 
-# Manual F-test using Wald test
-library(survey)
-pre_years <- unique(gss_pre$year)
-interaction_terms <- paste0("male:year_factor", setdiff(pre_years, min(pre_years)))
+# F-test comparing models
+f_test_result <- anova(restricted, unrestricted)
+f_stat <- f_test_result$F[2]
+f_p <- f_test_result$`Pr(>F)`[2]
 
-# Use regTermTest for survey-corrected F-test
-f_test_result <- regTermTest(unrestricted, interaction_terms, method = "Wald")
-
-cat("\nF-test for joint significance of pre-trend interactions:\n")
-cat("F =", round(f_test_result$Ftest, 3), "\n")
-cat("p =", round(f_test_result$p, 4), "\n")
+cat("\nF-test for joint significance of pre-trend interactions (2000-2010):\n")
+cat("F =", round(f_stat, 3), "\n")
+cat("p =", round(f_p, 4), "\n")
 cat("\nInterpretation: p > 0.05 means we CANNOT reject parallel pre-trends (GOOD)\n")
 
 # Create event-study plot
 p_event <- ggplot(event_coefs, aes(x = year, y = estimate_pp)) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
-  geom_vline(xintercept = 2011.5, linetype = "solid", color = "gray40", alpha = 0.5) +
-  annotate("text", x = 2012.3, y = max(event_coefs$conf.high_pp, na.rm = TRUE) - 5, 
-           label = "Tinder\nlaunches", hjust = 0, size = 3, color = "gray40") +
+  geom_vline(xintercept = 2011, linetype = "solid", color = "gray40", alpha = 0.5) +
+  annotate("text", x = 2011.5, y = max(event_coefs$conf.high_pp, na.rm = TRUE) - 5, 
+           label = "Tinder\nlaunches\n(Sep 2012)", hjust = 0, size = 3, color = "gray40") +
   geom_ribbon(aes(ymin = conf.low_pp, ymax = conf.high_pp), alpha = 0.2, fill = "gray40") +
   geom_line(linewidth = 1, color = "gray30") +
   geom_point(aes(shape = period), size = 3, color = "gray30") +
@@ -710,8 +709,8 @@ p_event <- ggplot(event_coefs, aes(x = year, y = estimate_pp)) +
   scale_x_continuous(breaks = seq(2000, 2018, 2)) +
   labs(
     title = "Event-Study: Male × Year Coefficients (GSS, Ages 18-24)",
-    subtitle = paste0("Reference year: 2011. Pre-trend F-test: F = ", 
-                      round(f_test_result$Ftest, 2), ", p = ", round(f_test_result$p, 3)),
+    subtitle = paste0("Reference year: 2010. Pre-trend F-test: F = ", 
+                      round(f_stat, 2), ", p = ", round(f_p, 3)),
     x = "Year",
     y = "Coefficient (percentage points)",
     caption = "Shaded area shows 95% CI. Flat pre-2012 supports parallel trends assumption."
@@ -1169,8 +1168,8 @@ for (ag in c("18-24", "25-29", "30-34", "35-44", "45-54")) {
 }
 
 cat("\nPRE-TREND TESTS (Appendix D1 & D2):\n")
-cat("  Event-study F-test: F = ", round(f_test_result$Ftest, 2), 
-    ", p = ", round(f_test_result$p, 3), "\n")
+cat("  Event-study F-test: F = ", round(f_stat, 2), 
+    ", p = ", round(f_p, 3), "\n")
 cat("  Slope test (weighted): ", round(slope_wt * 100, 2), " pp/year, p = ", 
     round(p_wt, 3), "\n")
 
